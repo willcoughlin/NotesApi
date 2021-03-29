@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using NotesApi.Exceptions;
 using NotesApi.Models;
 using NotesApi.Persistence;
 
@@ -36,9 +37,9 @@ namespace NotesApi.Controllers
             var result = _notesRepository.Get(id);
             if (result is null)
             {
-                return NotFound();
+                return NotFound(new ErrorResponse("Could not find note with ID " + id.ToString()));
             }
-            return Ok(result);
+            return result;
         }
 
         /// <summary>
@@ -47,11 +48,11 @@ namespace NotesApi.Controllers
         /// <param name="note">The note's title and contents.</param>
         /// <returns>Confirmation of note creation, with the new note's ID.</returns>
         [HttpPost]
-        public IActionResult Create([FromBody] NoteRequest note)
+        public CreateNoteResponse Create([FromBody] NoteRequest note)
         {
             var newNote = new Note(note.Title, note.Contents);
-            _notesRepository.Create(newNote);
-            return Ok();
+            var newNoteId = _notesRepository.Create(newNote);
+            return new CreateNoteResponse(newNoteId);
         }
 
         /// <summary>
@@ -72,7 +73,7 @@ namespace NotesApi.Controllers
             }
             catch (ResourceNotFoundException)
             {
-                return NotFound();
+                return NotFound(new ErrorResponse("Could not find note with ID " + id.ToString()));
             }
             
             return Ok();
@@ -93,7 +94,7 @@ namespace NotesApi.Controllers
             }
             catch (ResourceNotFoundException)
             {
-                return NotFound();
+                return NotFound(new ErrorResponse("Could not find note with ID " + id.ToString()));
             }
 
             return Ok();

@@ -1,5 +1,3 @@
-using System;
-
 namespace NotesApi.Models
 {
     public class Note 
