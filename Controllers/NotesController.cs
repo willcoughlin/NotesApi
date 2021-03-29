@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using NotesApi.Models;
+using NotesApi.Persistence;
 
 namespace NotesApi.Controllers
 {
@@ -9,15 +10,19 @@ namespace NotesApi.Controllers
     [Produces("application/json")]
     public class NotesController : ControllerBase 
     {
+        private readonly INotesRepository _notesRepository;
+
+        public NotesController(INotesRepository notesRepository)
+        {
+            _notesRepository = notesRepository;
+        }
+
         /// <summary>
         /// List all existing notes.
         /// </summary>
         /// <returns>A collection of all notes saved.</returns>
         [HttpGet]
-        public ActionResult<IEnumerable<Note>> GetAll()
-        {
-            return Ok();
-        }
+        public ActionResult<IEnumerable<Note>> GetAll() => Ok(_notesRepository.GetAll());
 
         /// <summary>
         /// Get a specific note.
@@ -26,9 +31,14 @@ namespace NotesApi.Controllers
         /// <returns>A note specified by the provided ID.</returns>
         [HttpGet]
         [Route("{id}")]
-        public ActionResult<Note> Get(int id) 
+        public ActionResult<Note> Get(int id)
         {
-            return Ok(new Note { Id = id });
+            var result = _notesRepository.Get(id);
+            if (result is null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
         /// <summary>
@@ -39,7 +49,9 @@ namespace NotesApi.Controllers
         [HttpPost]
         public IActionResult Create([FromBody] NoteRequest note)
         {
-            return Ok(new Note { Title = note.Title, Contents = note.Contents });
+            var newNote = new Note(note.Title, note.Contents);
+            _notesRepository.Create(newNote);
+            return Ok();
         }
 
         /// <summary>
@@ -52,11 +64,22 @@ namespace NotesApi.Controllers
         [Route("{id}")]
         public IActionResult Edit(int id, [FromBody] NoteRequest note)
         {
-            return Ok(new Note { Id = id, Title = note.Title, Contents = note.Contents });
+            var updatedNote = new Note(id, note.Title, note.Contents);
+
+            try 
+            {
+                _notesRepository.Edit(updatedNote);
+            }
+            catch (ResourceNotFoundException)
+            {
+                return NotFound();
+            }
+            
+            return Ok();
         }
 
         /// <summary>
-        /// Delete and existing note.
+        /// Delete an existing note.
         /// </summary>
         /// <param name="id">The note's ID.</param>
         /// <returns>Confirmation of note deletion.</returns>
@@ -64,7 +87,16 @@ namespace NotesApi.Controllers
         [Route("{id}")]
         public IActionResult Delete(int id)
         {
-            return Ok(new Note { Id = id });
+            try 
+            {
+                _notesRepository.Delete(id);
+            }
+            catch (ResourceNotFoundException)
+            {
+                return NotFound();
+            }
+
+            return Ok();
         }
     }
 }
