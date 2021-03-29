@@ -1,7 +1,11 @@
+using System.Text.Json.Serialization;
+
 namespace NotesApi.Models
 {
     public class Note 
     {
+        public Note() { }
+
         public Note(string title, string contents) : this(default, title, contents) {}
 
         public Note(int id, string title, string contents) 
