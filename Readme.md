@@ -1,9 +1,9 @@
 # NotesApi
-## Running the project
+## Running the Project
 1. Install [The .NET 5.0 SDK](https://dotnet.microsoft.com/download/dotnet/5.0).
-2. From within the project directory, run `dotnet run`. After running this, you should see in the terminal that it's running:
+2. From within the root project directory, run `dotnet run --project ./NotesApi/NotesApi.csproj`. After running this, you should see in the terminal that it's running:
 ```
-> dotnet run
+> dotnet run --project ./NotesApi/NotesApi.csproj
 Building...
 info: Microsoft.Hosting.Lifetime[0]
       Now listening on: https://localhost:5001
@@ -19,7 +19,15 @@ info: Microsoft.Hosting.Lifetime[0]
 
 3. Open [http://localhost:5000/swagger](http://localhost:5000/swagger) in your browser to view the API documentation.
 
+![](SwaggerUI.png)
+
 4. Use a tool like cURL or Postman to make requests. Note that dotnet configures HTTPS by default. You may run into issues if you try to use the the HTTPS port `5001` or encountering HTTPS redirection even with the HTTP url. See [Troubleshooting](#Troubleshooting) for more info.
+
+## Unit Tests
+I've also added unit tests for the NotesController class. To execute the tests, run the following command from within the project root:
+```
+> dotnet test
+```
 
 ## Examples
 ### Creating a note
@@ -59,7 +67,7 @@ Transfer-Encoding: chunked
 ```
 
 ## Source code
-You'll see some files that were created as standard .NET boilerplate: *appsettings.json*, *appsettings.Development.json*, *NotesApi.csproj*, and *Properties/launchSettings.json*.
+Within the project, open the *NotesApi* directory. You'll see some files that were created as standard .NET boilerplate: *appsettings.json*, *appsettings.Development.json*, *NotesApi.csproj*, and *Properties/launchSettings.json*.
 
 Here's a rundown of the C# source files:
 
@@ -89,4 +97,6 @@ how to fix it, please visit the web page mentioned above.
 **To fix: make sure you use the `-k` flag before the URLs in your command.**
 
 ### Postman states "SSL Error: Unable to verify the first certificate"
-You may see the above error message displayed when using Postman. To disable SSL certificate validation, disable it in *File* > *Settings* > *General*
+You may see the above error message displayed when using Postman. 
+
+**To fix: disable SSL certificate validation within Postman at *File* > *Settings* > *General***.
